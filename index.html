@@ -177,23 +177,23 @@
 
                 if (r < 0.45) {
                     winner = "1 месяц";
-                    rarityInfo = { text: "Обычный приз", color: "text-gray-400" };
+                    rarityInfo = { text: "Обычный приз (45%)", color: "text-gray-400" };
                     statKey = "1m";
                 } else if (r < 0.75) {
                     winner = "3 месяца";
-                    rarityInfo = { text: "Редкий приз", color: "text-blue-400" };
+                    rarityInfo = { text: "Редкий приз (30%)", color: "text-blue-400" };
                     statKey = "3m";
                 } else if (r < 0.90) {
                     winner = "6 месяцев";
-                    rarityInfo = { text: "Эпический приз", color: "text-purple-400" };
+                    rarityInfo = { text: "Эпический приз (15%)", color: "text-purple-400" };
                     statKey = "6m";
                 } else if (r < 0.98) {
                     winner = "1 год";
-                    rarityInfo = { text: "Мифический приз", color: "text-pink-400" };
+                    rarityInfo = { text: "Мифический приз (8%)", color: "text-pink-400" };
                     statKey = "1y";
                 } else {
                     winner = "2 года 🤯";
-                    rarityInfo = { text: "ЛЕГЕНДАРНЫЙ ПРИЗ", color: "text-yellow-400" };
+                    rarityInfo = { text: "ЛЕГЕНДАРНЫЙ ПРИЗ (2%)", color: "text-yellow-400" };
                     statKey = "2y";
                 }
 
