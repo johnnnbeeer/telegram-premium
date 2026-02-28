@@ -51,9 +51,14 @@
         .animate-spin-fast {
             animation: spin-fast 0.5s linear infinite;
         }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
-<body class="min-h-screen text-white flex items-center justify-center p-4">
+<body class="min-h-screen text-white flex flex-col items-center justify-center p-4 gap-6">
 
     <!-- Главная карточка розыгрыша -->
     <div class="glass-panel rounded-3xl p-8 max-w-sm w-full text-center relative overflow-hidden">
@@ -89,7 +94,39 @@
         
         <!-- Заглушка, чтобы высота карточки не прыгала до первого прокрута -->
         <div id="placeholder" class="mt-6 h-24"></div>
+    </div>
 
+    <!-- Панель статистики -->
+    <div class="glass-panel rounded-3xl p-6 max-w-sm w-full relative z-10">
+        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-gray-400">Статистика</h2>
+            <div class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-bold">
+                Всего: <span id="totalSpins">0</span>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 gap-2 text-sm">
+            <div class="flex justify-between items-center p-2 rounded-xl stat-badge">
+                <span class="text-gray-300">1 месяц (50%)</span>
+                <span id="count-1m" class="font-mono font-bold">0</span>
+            </div>
+            <div class="flex justify-between items-center p-2 rounded-xl stat-badge">
+                <span class="text-blue-400">3 месяца (30%)</span>
+                <span id="count-3m" class="font-mono font-bold">0</span>
+            </div>
+            <div class="flex justify-between items-center p-2 rounded-xl stat-badge">
+                <span class="text-purple-400">6 месяцев (10%)</span>
+                <span id="count-6m" class="font-mono font-bold">0</span>
+            </div>
+            <div class="flex justify-between items-center p-2 rounded-xl stat-badge">
+                <span class="text-pink-400">1 год (9%)</span>
+                <span id="count-1y" class="font-mono font-bold">0</span>
+            </div>
+            <div class="flex justify-between items-center p-2 rounded-xl stat-badge border-yellow-500/30">
+                <span class="text-yellow-400 font-bold">2 года (1%)</span>
+                <span id="count-2y" class="font-mono font-bold text-yellow-400">0</span>
+            </div>
+        </div>
     </div>
 
     <!-- Логика розыгрыша -->
@@ -100,6 +137,17 @@
         const resultValue = document.getElementById('resultValue');
         const rarityLabel = document.getElementById('rarityLabel');
         const placeholder = document.getElementById('placeholder');
+        
+        // Элементы статистики
+        const totalSpinsEl = document.getElementById('totalSpins');
+        const stats = {
+            '1m': { el: document.getElementById('count-1m'), count: 0 },
+            '3m': { el: document.getElementById('count-3m'), count: 0 },
+            '6m': { el: document.getElementById('count-6m'), count: 0 },
+            '1y': { el: document.getElementById('count-1y'), count: 0 },
+            '2y': { el: document.getElementById('count-2y'), count: 0 }
+        };
+        let totalSpins = 0;
 
         spinBtn.addEventListener('click', () => {
             // 1. Состояние загрузки (крутим рулетку)
@@ -120,29 +168,44 @@
             resultContainer.classList.add('hidden', 'opacity-0');
             placeholder.classList.remove('hidden');
 
-            // 2. Имитация задержки "рулетки" (1.5 секунды)
+            // 2. Имитация задержки "рулетки" (1.2 секунды)
             setTimeout(() => {
-                // ТА САМАЯ ЛОГИКА ИЗ PYTHON КОДА
                 const r = Math.random();
                 let winner = "";
                 let rarityInfo = { text: "", color: "" };
+                let statKey = "";
 
                 if (r < 0.5) {
                     winner = "1 месяц";
                     rarityInfo = { text: "Обычный приз (50%)", color: "text-gray-400" };
+                    statKey = "1m";
                 } else if (r < 0.8) {
                     winner = "3 месяца";
                     rarityInfo = { text: "Редкий приз (30%)", color: "text-blue-400" };
+                    statKey = "3m";
                 } else if (r < 0.9) {
                     winner = "6 месяцев";
                     rarityInfo = { text: "Эпический приз (10%)", color: "text-purple-400" };
+                    statKey = "6m";
                 } else if (r < 0.99) {
                     winner = "1 год";
                     rarityInfo = { text: "Мифический приз (9%)", color: "text-pink-400" };
+                    statKey = "1y";
                 } else {
                     winner = "2 года 🤯";
                     rarityInfo = { text: "ЛЕГЕНДАРНЫЙ ПРИЗ (1%)", color: "text-yellow-400" };
+                    statKey = "2y";
                 }
+
+                // Обновляем статистику
+                totalSpins++;
+                stats[statKey].count++;
+                totalSpinsEl.textContent = totalSpins;
+                stats[statKey].el.textContent = stats[statKey].count;
+                
+                // Подсвечиваем обновленный счетчик
+                stats[statKey].el.parentElement.classList.add('bg-white/10');
+                setTimeout(() => stats[statKey].el.parentElement.classList.remove('bg-white/10'), 500);
 
                 // 3. Вывод результата
                 premiumStar.classList.remove('animate-spin-fast');
@@ -154,17 +217,17 @@
                 placeholder.classList.add('hidden');
                 resultContainer.classList.remove('hidden');
                 
-                // Небольшая задержка перед появлением для плавности
+                // Плавное появление
                 setTimeout(() => {
                     resultContainer.classList.remove('opacity-0');
                 }, 50);
 
-                // 4. Возвращаем кнопку в исходное состояние
+                // 4. Возвращаем кнопку
                 spinBtn.disabled = false;
                 spinBtn.innerHTML = "Крутить еще раз";
                 spinBtn.classList.remove('opacity-80', 'cursor-not-allowed');
 
-            }, 1500); // 1.5 секунды интриги
+            }, 1200);
         });
     </script>
 </body>
