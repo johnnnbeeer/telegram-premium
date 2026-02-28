@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Розыгрыш Telegram Premium</title>
+    <!-- Подключаем Tailwind CSS для быстрого и красивого дизайна -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Пользовательские стили для эффекта стекла и градиентов Telegram */
+        body {
+            /* Темный космический фон */
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .tg-btn-gradient {
+            background: linear-gradient(135deg, #2AABEE 0%, #229ED9 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .tg-btn-gradient:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(42, 171, 238, 0.8);
+        }
+
+        .tg-btn-gradient:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Анимация вращения для звездочки */
+        @keyframes spin-fast {
+            from { transform: rotate(0deg) scale(1.1); }
+            to { transform: rotate(360deg) scale(1.1); }
+        }
+        .animate-spin-fast {
+            animation: spin-fast 0.5s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white flex items-center justify-center p-4">
+
+    <!-- Главная карточка розыгрыша -->
+    <div class="glass-panel rounded-3xl p-8 max-w-sm w-full text-center relative overflow-hidden">
+        
+        <!-- Декоративные фоновые свечения -->
+        <div class="absolute top-0 left-0 w-full h-1/2 bg-blue-500/10 blur-3xl rounded-full -translate-y-1/2"></div>
+        
+        <!-- Иконка Premium (Звезда) -->
+        <div class="mb-6 relative z-10">
+            <div id="premiumStar" class="text-6xl inline-block drop-shadow-[0_0_15px_rgba(167,139,250,0.5)] transition-transform duration-300">
+                ⭐
+            </div>
+        </div>
+
+        <!-- Заголовки -->
+        <div class="relative z-10">
+            <h1 class="text-2xl font-bold mb-2">Розыгрыш <br><span class="text-gradient text-3xl">Telegram Premium</span></h1>
+            <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+                Нажмите на кнопку ниже, чтобы случайным образом определить длительность вашей подписки!
+            </p>
+        </div>
+
+        <!-- Кнопка запуска -->
+        <button id="spinBtn" class="tg-btn-gradient w-full py-4 rounded-2xl font-semibold text-lg text-white shadow-lg relative z-10 flex items-center justify-center gap-2">
+            <span>Испытать удачу</span>
+        </button>
+
+        <!-- Блок с результатами (изначально скрыт) -->
+        <div id="resultContainer" class="mt-6 h-24 flex flex-col items-center justify-center opacity-0 transition-opacity duration-500 hidden relative z-10">
+            <span id="rarityLabel" class="text-xs font-medium uppercase tracking-wider mb-1"></span>
+            <div id="resultValue" class="text-3xl font-extrabold text-white drop-shadow-md"></div>
+        </div>
+        
+        <!-- Заглушка, чтобы высота карточки не прыгала до первого прокрута -->
+        <div id="placeholder" class="mt-6 h-24"></div>
+
+    </div>
+
+    <!-- Логика розыгрыша -->
+    <script>
+        const spinBtn = document.getElementById('spinBtn');
+        const premiumStar = document.getElementById('premiumStar');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultValue = document.getElementById('resultValue');
+        const rarityLabel = document.getElementById('rarityLabel');
+        const placeholder = document.getElementById('placeholder');
+
+        spinBtn.addEventListener('click', () => {
+            // 1. Состояние загрузки (крутим рулетку)
+            spinBtn.disabled = true;
+            spinBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Выбираем...
+            `;
+            spinBtn.classList.add('opacity-80', 'cursor-not-allowed');
+            
+            // Анимация звездочки
+            premiumStar.classList.add('animate-spin-fast');
+            
+            // Скрываем прошлый результат
+            resultContainer.classList.add('hidden', 'opacity-0');
+            placeholder.classList.remove('hidden');
+
+            // 2. Имитация задержки "рулетки" (1.5 секунды)
+            setTimeout(() => {
+                // ТА САМАЯ ЛОГИКА ИЗ PYTHON КОДА
+                const r = Math.random();
+                let winner = "";
+                let rarityInfo = { text: "", color: "" };
+
+                if (r < 0.5) {
+                    winner = "1 месяц";
+                    rarityInfo = { text: "Обычный приз (50%)", color: "text-gray-400" };
+                } else if (r < 0.8) {
+                    winner = "3 месяца";
+                    rarityInfo = { text: "Редкий приз (30%)", color: "text-blue-400" };
+                } else if (r < 0.9) {
+                    winner = "6 месяцев";
+                    rarityInfo = { text: "Эпический приз (10%)", color: "text-purple-400" };
+                } else if (r < 0.99) {
+                    winner = "1 год";
+                    rarityInfo = { text: "Мифический приз (9%)", color: "text-pink-400" };
+                } else {
+                    winner = "2 года 🤯";
+                    rarityInfo = { text: "ЛЕГЕНДАРНЫЙ ПРИЗ (1%)", color: "text-yellow-400" };
+                }
+
+                // 3. Вывод результата
+                premiumStar.classList.remove('animate-spin-fast');
+                
+                rarityLabel.textContent = rarityInfo.text;
+                rarityLabel.className = `text-xs font-bold uppercase tracking-wider mb-1 ${rarityInfo.color}`;
+                resultValue.innerHTML = winner;
+
+                placeholder.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+                
+                // Небольшая задержка перед появлением для плавности
+                setTimeout(() => {
+                    resultContainer.classList.remove('opacity-0');
+                }, 50);
+
+                // 4. Возвращаем кнопку в исходное состояние
+                spinBtn.disabled = false;
+                spinBtn.innerHTML = "Крутить еще раз";
+                spinBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+
+            }, 1500); // 1.5 секунды интриги
+        });
+    </script>
+</body>
+</html>
